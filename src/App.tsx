@@ -2,18 +2,24 @@
 ESTRUTURA DO PROJETO — GITHUB
 /
 ├── index.html
+├── /public
+│   └── /avaliar/index.html     ← redireciona para a avaliação no Google
 ├── /assets
 │   ├── /images
-│   │   ├── logo.png          ← logotipo do cabeçalho
-│   │   ├── hero-profissional.png   ← foto do profissional no Hero
-│   │   ├── sofa-antes-depois.png
-│   │   ├── colchao-antes-depois.png
-│   │   ├── tapete-antes-depois.png
-│   │   ├── poltrona-antes-depois.png
-│   │   ├── cadeiras-antes-depois.png
-│   │   ├── couro-antes-depois.png
-│   │   ├── pet-sofa.png            ← foto da seção Pet Friendly
-│   │   └── condominio.png          ← foto da seção Condomínios
+│   │   ├── logo.png                 ← logotipo horizontal (fundo claro)
+│   │   ├── logo-branco.png          ← logotipo horizontal (rodapé escuro)
+│   │   ├── favicon.ico / favicon-512.png / apple-touch-icon.png
+│   │   ├── og-capa.jpg              ← prévia ao compartilhar o link
+│   │   ├── hero-profissional.jpg    ← foto do profissional no Hero
+│   │   ├── equipe.jpg               ← seção "Quem vai até a sua casa"
+│   │   ├── sofa-antes-depois.jpg
+│   │   ├── colchao-antes-depois.jpg
+│   │   ├── tapete-antes-depois.jpg
+│   │   ├── poltrona-antes-depois.jpg
+│   │   ├── cadeiras-antes-depois.jpg
+│   │   ├── ambiente-sala.jpg        ← seção Pet Friendly
+│   │   ├── condominio.jpg           ← seção Condomínios
+│   │   └── trabalho-01.jpg … trabalho-14.jpg   ← galeria de trabalhos
 */
 import { useState, useEffect, useCallback } from 'react';
 import { 
@@ -169,20 +175,17 @@ export default function App() {
             <div className="flex items-center gap-2">
               <img 
                 src="assets/images/logo.png" 
-                alt="O Doutor Limpeza" 
-                style={{ height: '48px', width: 'auto' }}
-                className="block"
-                onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                alt="O Doutor Limpeza — Higienização de Estofados em Rondonópolis"
+                width={320}
+                height={115}
+                className="block h-11 sm:h-14 w-auto object-contain"
               />
-              <div className="flex flex-col">
-                <span className="font-bold text-lg sm:text-xl leading-none text-blue-900 uppercase tracking-tight">O Doutor Limpeza</span>
-                <span className="text-[10px] sm:text-xs text-blue-600 font-medium tracking-widest uppercase">Nossa família cuida da sua</span>
-              </div>
             </div>
 
             {/* Desktop Nav */}
             <nav className="hidden md:flex items-center gap-8">
               <a href="#servicos" className="text-sm font-medium hover:text-blue-600 transition-colors">Serviços</a>
+              <a href="#trabalhos" className="text-sm font-medium hover:text-blue-600 transition-colors">Trabalhos</a>
               <a href="#diferenciais" className="text-sm font-medium hover:text-blue-600 transition-colors">Diferenciais</a>
               <a href="#faq" className="text-sm font-medium hover:text-blue-600 transition-colors">Dúvidas</a>
               <a href={WHATSAPP_URL} target="_blank" rel="noreferrer" className="bg-blue-600 text-white px-5 py-2.5 rounded-full text-sm font-bold hover:bg-blue-700 transition-all shadow-lg shadow-blue-200 flex items-center gap-2">
@@ -269,8 +272,8 @@ export default function App() {
             >
               <div className="aspect-[4/5] bg-blue-900/30 rounded-[3rem] overflow-hidden border border-white/10 relative">
                 <img 
-                  src="assets/images/hero-profissional.png" 
-                  alt="Profissional O Doutor Limpeza" 
+                  src="assets/images/hero-profissional.jpg" 
+                  alt="Profissional da O Doutor Limpeza higienizando um sofá com extratora em Rondonópolis" 
                   className="w-full h-full object-cover"
                   referrerPolicy="no-referrer"
                 />
@@ -355,12 +358,11 @@ export default function App() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {[
-              { label: "SOFÁ", color: "bg-blue-500", img: "sofa-antes-depois.png" },
-              { label: "COLCHÃO", color: "bg-orange-500", img: "colchao-antes-depois.png" },
-              { label: "TAPETE", color: "bg-green-500", img: "tapete-antes-depois.png" },
-              { label: "POLTRONA", color: "bg-purple-500", img: "poltrona-antes-depois.png" },
-              { label: "CADEIRAS", color: "bg-teal-500", img: "cadeiras-antes-depois.png" },
-              { label: "COURO", color: "bg-amber-600", img: "couro-antes-depois.png" }
+              { label: "SOFÁ DE COURO", color: "bg-blue-500", img: "sofa-antes-depois.jpg" },
+              { label: "COLCHÃO", color: "bg-orange-500", img: "colchao-antes-depois.jpg" },
+              { label: "TAPETE", color: "bg-green-500", img: "tapete-antes-depois.jpg" },
+              { label: "POLTRONA", color: "bg-purple-500", img: "poltrona-antes-depois.jpg" },
+              { label: "CADEIRAS", color: "bg-teal-500", img: "cadeiras-antes-depois.jpg" }
             ].map((item, idx) => (
               <div key={idx} className="aspect-video bg-slate-100 rounded-3xl flex flex-col items-center justify-center relative overflow-hidden group">
                 <div className={`absolute top-4 left-4 ${item.color} text-white text-[10px] font-bold px-3 py-1 rounded-full z-10`}>
@@ -368,9 +370,12 @@ export default function App() {
                 </div>
                 <img 
                   src={`assets/images/${item.img}`} 
-                  alt={`${item.label} antes e depois`} 
+                  alt={`Higienização de ${item.label.toLowerCase()} em Rondonópolis — antes e depois`} 
+                  loading="lazy"
+                  decoding="async"
+                  width={1280}
+                  height={720}
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                  referrerPolicy="no-referrer"
                   onError={(e) => {
                     (e.target as HTMLImageElement).style.display = 'none';
                   }}
@@ -396,6 +401,81 @@ export default function App() {
           </div>
         </div>
       </section>
+      {/* Trabalhos realizados */}
+      <section id="trabalhos" className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-14">
+            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Trabalhos que já entregamos</h2>
+            <p className="text-slate-600 max-w-2xl mx-auto">De apartamento a hall de condomínio, de poltrona de designer a cadeira de jantar. Todos em Rondonópolis.</p>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[
+              { img: "trabalho-01.jpg", alt: "Recamier branco higienizado em sala de estar" },
+              { img: "trabalho-02.jpg", alt: "Sofá modular bege higienizado em apartamento" },
+              { img: "trabalho-03.jpg", alt: "Sofá verde higienizado em sala" },
+              { img: "trabalho-04.jpg", alt: "Banco de veludo verde em hall de mármore" },
+              { img: "trabalho-05.jpg", alt: "Hall de condomínio com recamier higienizado" },
+              { img: "trabalho-06.jpg", alt: "Poltrona clássica higienizada" },
+              { img: "trabalho-07.jpg", alt: "Cadeira clássica branca higienizada" },
+              { img: "trabalho-08.jpg", alt: "Poltronas de couro higienizadas" },
+              { img: "trabalho-09.jpg", alt: "Poltrona branca higienizada em quarto" },
+              { img: "trabalho-10.jpg", alt: "Banco de madeira com assento higienizado" },
+              { img: "trabalho-11.jpg", alt: "Banqueta estofada higienizada" },
+              { img: "trabalho-12.jpg", alt: "Equipe higienizando poltrona com extratora" },
+              { img: "trabalho-13.jpg", alt: "Higienização de cabeceira estofada de cama" },
+              { img: "trabalho-14.jpg", alt: "Aspiração de carpete em escritório" }
+            ].map((item, idx) => (
+              <div key={idx} className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 group">
+                <img
+                  src={`assets/images/${item.img}`}
+                  alt={item.alt}
+                  loading="lazy"
+                  decoding="async"
+                  width={900}
+                  height={675}
+                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Quem atende */}
+      <section id="equipe" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div className="aspect-[16/10] rounded-[2.5rem] overflow-hidden bg-slate-200 shadow-xl shadow-slate-200/60">
+              <img
+                src="assets/images/equipe.jpg"
+                alt="Zilda e Edvaldo, da O Doutor Limpeza, de uniforme"
+                loading="lazy"
+                decoding="async"
+                width={1280}
+                height={800}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            <div>
+              <span className="text-blue-600 font-bold text-sm uppercase tracking-widest">Quem vai até a sua casa</span>
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mt-3 mb-6">Nossa família cuida da sua</h2>
+              <p className="text-slate-600 text-lg leading-relaxed mb-6">
+                Quem toca a campainha da sua casa são o <strong className="text-slate-900">seu Edvaldo</strong> e a <strong className="text-slate-900">dona Zilda</strong>. São eles que fazem cada atendimento, de uniforme, com o equipamento próprio e o cuidado de quem trata o móvel dos outros como se fosse o seu.
+              </p>
+              <p className="text-slate-600 text-lg leading-relaxed mb-8">
+                É por isso que a O Doutor Limpeza tem <strong className="text-slate-900">nota 5,0 no Google</strong>, com mais de cem avaliações de clientes de Rondonópolis.
+              </p>
+              <div className="flex flex-wrap gap-3">
+                <div className="bg-slate-50 px-4 py-2 rounded-full border border-slate-200 text-sm font-bold text-slate-700">Desde 2016</div>
+                <div className="bg-slate-50 px-4 py-2 rounded-full border border-slate-200 text-sm font-bold text-slate-700">Equipe uniformizada</div>
+                <div className="bg-slate-50 px-4 py-2 rounded-full border border-slate-200 text-sm font-bold text-slate-700">Equipamento próprio</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section id="diferenciais" className="py-20 bg-blue-950 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -418,10 +498,11 @@ export default function App() {
             <div className="relative">
               <div className="aspect-square rounded-3xl overflow-hidden bg-blue-600 relative">
                 <img 
-                  src="https://picsum.photos/seed/cleaning/800/800" 
-                  alt="Limpeza de sofá" 
+                  src="assets/images/trabalho-12.jpg"
+                  alt="Higienização de estofado com extratora"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover mix-blend-overlay opacity-50"
-                  referrerPolicy="no-referrer"
                 />
                 <div className="absolute inset-0 flex items-center justify-center p-8">
                   <div className="bg-white/10 backdrop-blur-md border border-white/20 p-8 rounded-2xl text-white">
@@ -464,8 +545,10 @@ export default function App() {
             </div>
             <div className="aspect-square lg:aspect-video bg-slate-200 rounded-[2.5rem] flex items-center justify-center text-slate-400 relative overflow-hidden">
               <img 
-                src="assets/images/pet-sofa.png" 
-                alt="Pet no sofá" 
+                src="assets/images/ambiente-sala.jpg"
+                loading="lazy"
+                decoding="async" 
+                alt="Sofá higienizado em sala de estar" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -487,8 +570,8 @@ export default function App() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
             <div className="order-2 lg:order-1 aspect-square lg:aspect-video bg-slate-200 rounded-[2.5rem] flex items-center justify-center text-slate-400 relative overflow-hidden">
               <img 
-                src="assets/images/condominio.png" 
-                alt="Condomínio" 
+                src="assets/images/condominio.jpg" 
+                alt="Higienização de tapete no hall de um condomínio em Rondonópolis" 
                 className="w-full h-full object-cover"
                 referrerPolicy="no-referrer"
                 onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
@@ -554,8 +637,7 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-2 mb-4">
-              <img src="https://www.google.com/images/branding/googlelogo/2x/googlelogo_color_92x30dp.png" alt="Google" className="h-6" referrerPolicy="no-referrer" />
-              <span className="text-slate-400 font-medium">Avaliações</span>
+              <span className="text-slate-500 font-semibold">Avaliações no Google</span>
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">O que dizem nossos clientes</h2>
             <div className="flex items-center justify-center gap-3">
@@ -573,9 +655,6 @@ export default function App() {
                 {testimonials.map((t: any, idx) => (
                   <div key={idx} className="flex-[0_0_100%] md:flex-[0_0_50%] lg:flex-[0_0_33.333%] min-w-0">
                     <div className="bg-slate-50 p-8 rounded-3xl border border-slate-100 relative h-full flex flex-col">
-                      <div className="absolute top-6 right-8">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_Logo.svg" alt="G" className="w-4 h-4 opacity-20" referrerPolicy="no-referrer" />
-                      </div>
                       <div className="flex gap-1 text-orange-500 mb-4">
                         {[...Array(5)].map((_, i) => <Star key={i} className={`w-3 h-3 ${i < t.rating ? 'fill-current' : 'text-slate-200'}`} />)}
                       </div>
@@ -691,12 +770,12 @@ export default function App() {
             <div className="space-y-6">
               <div className="flex items-center gap-2">
                 <img 
-                  src="assets/images/logo.png" 
+                  src="assets/images/logo-branco.png" 
                   alt="O Doutor Limpeza" 
-                  style={{ height: '40px', width: 'auto' }}
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
+                  width={280}
+                  height={100}
+                  className="h-10 w-auto object-contain"
                 />
-                <span className="font-bold text-xl uppercase tracking-tight">O Doutor Limpeza</span>
               </div>
               <p className="text-slate-400 text-sm leading-relaxed">
                 Nossa família cuida da sua. Higienização profissional de estofados com tecnologia de ponta em Rondonópolis, MT.
