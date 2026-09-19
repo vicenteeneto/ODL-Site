@@ -51,6 +51,23 @@ import useEmblaCarousel from 'embla-carousel-react';
 const WHATSAPP_URL = "https://wa.me/5566997170914";
 const INSTAGRAM_URL = "https://instagram.com/odoutorlimpeza";
 
+const WORKS = [
+  { img: "trabalho-01.jpg", alt: "Recamier branco higienizado em sala de estar" },
+  { img: "trabalho-02.jpg", alt: "Sofá modular bege higienizado em apartamento" },
+  { img: "trabalho-03.jpg", alt: "Sofá verde higienizado em sala" },
+  { img: "trabalho-04.jpg", alt: "Banco de veludo verde em hall de mármore" },
+  { img: "trabalho-05.jpg", alt: "Hall de condomínio com recamier higienizado" },
+  { img: "trabalho-06.jpg", alt: "Poltrona clássica higienizada" },
+  { img: "trabalho-07.jpg", alt: "Cadeira clássica branca higienizada" },
+  { img: "trabalho-08.jpg", alt: "Poltronas de couro higienizadas" },
+  { img: "trabalho-09.jpg", alt: "Poltrona branca higienizada em quarto" },
+  { img: "trabalho-10.jpg", alt: "Banco de madeira com assento higienizado" },
+  { img: "trabalho-11.jpg", alt: "Banqueta estofada higienizada" },
+  { img: "trabalho-12.jpg", alt: "Equipe higienizando poltrona com extratora" },
+  { img: "trabalho-13.jpg", alt: "Higienização de cabeceira estofada de cama" },
+  { img: "trabalho-14.jpg", alt: "Aspiração de carpete em escritório" },
+];
+
 export default function App() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeFaq, setActiveFaq] = useState<number | null>(null);
@@ -59,6 +76,8 @@ export default function App() {
   const [totalRatings, setTotalRatings] = useState<number>(0);
   const [isLoadingReviews, setIsLoadingReviews] = useState(true);
   const [emblaRef, emblaApi] = useEmblaCarousel({ loop: true, align: 'start' });
+  const [worksRef, worksApi] = useEmblaCarousel({ loop: true, align: 'start', dragFree: true });
+  const [worksIndex, setWorksIndex] = useState(0);
 
   const scrollPrev = useCallback(() => {
     if (emblaApi) emblaApi.scrollPrev();
@@ -68,25 +87,43 @@ export default function App() {
     if (emblaApi) emblaApi.scrollNext();
   }, [emblaApi]);
 
+  const worksPrev = useCallback(() => { if (worksApi) worksApi.scrollPrev(); }, [worksApi]);
+  const worksNext = useCallback(() => { if (worksApi) worksApi.scrollNext(); }, [worksApi]);
+
   useEffect(() => {
+    if (!worksApi) return;
+    const onSelect = () => setWorksIndex(worksApi.selectedScrollSnap());
+    worksApi.on('select', onSelect);
+    onSelect();
+    return () => { worksApi.off('select', onSelect); };
+  }, [worksApi]);
+
+  useEffect(() => {
+    let vivo = true;
+
     async function fetchReviews() {
       try {
         const response = await fetch('/api/reviews');
-        if (response.ok) {
-          const data = await response.json();
-          if (data.reviews && data.reviews.length > 0) {
-            setGoogleReviews(data.reviews);
-            setGoogleRating(data.rating);
-            setTotalRatings(data.total_ratings);
-          }
+        if (!response.ok) return;
+        const data = await response.json();
+        if (!vivo) return;
+        // nota e total vêm do Google mesmo quando ele não devolve textos
+        if (typeof data.rating === 'number') setGoogleRating(data.rating);
+        if (typeof data.total_ratings === 'number') setTotalRatings(data.total_ratings);
+        if (Array.isArray(data.reviews) && data.reviews.length > 0) {
+          setGoogleReviews(data.reviews);
         }
       } catch (error) {
-        console.error("Failed to fetch reviews:", error);
+        console.error("Falha ao buscar avaliacoes:", error);
       } finally {
-        setIsLoadingReviews(false);
+        if (vivo) setIsLoadingReviews(false);
       }
     }
+
     fetchReviews();
+    // revalida a cada 30 min para quem deixa a aba aberta
+    const timer = setInterval(fetchReviews, 30 * 60 * 1000);
+    return () => { vivo = false; clearInterval(timer); };
   }, []);
 
   const testimonials = googleReviews.length > 0 ? googleReviews.map(r => ({
@@ -404,39 +441,58 @@ export default function App() {
       {/* Trabalhos realizados */}
       <section id="trabalhos" className="py-20 bg-slate-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-14">
-            <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">Trabalhos que já entregamos</h2>
-            <p className="text-slate-600 max-w-2xl mx-auto">De apartamento a hall de condomínio, de poltrona de designer a cadeira de jantar. Todos em Rondonópolis.</p>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10">
+            <div>
+              <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-3">Trabalhos que já entregamos</h2>
+              <p className="text-slate-600 max-w-xl">De apartamento a hall de condomínio, de poltrona de designer a cadeira de jantar. Todos em Rondonópolis.</p>
+            </div>
+            <div className="flex gap-3 shrink-0">
+              <button
+                onClick={worksPrev}
+                aria-label="Ver trabalhos anteriores"
+                className="w-12 h-12 rounded-full border border-slate-300 bg-white flex items-center justify-center hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-colors"
+              >
+                <ChevronLeft className="w-5 h-5" />
+              </button>
+              <button
+                onClick={worksNext}
+                aria-label="Ver próximos trabalhos"
+                className="w-12 h-12 rounded-full border border-slate-300 bg-white flex items-center justify-center hover:bg-slate-900 hover:text-white hover:border-slate-900 transition-colors"
+              >
+                <ChevronRight className="w-5 h-5" />
+              </button>
+            </div>
           </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {[
-              { img: "trabalho-01.jpg", alt: "Recamier branco higienizado em sala de estar" },
-              { img: "trabalho-02.jpg", alt: "Sofá modular bege higienizado em apartamento" },
-              { img: "trabalho-03.jpg", alt: "Sofá verde higienizado em sala" },
-              { img: "trabalho-04.jpg", alt: "Banco de veludo verde em hall de mármore" },
-              { img: "trabalho-05.jpg", alt: "Hall de condomínio com recamier higienizado" },
-              { img: "trabalho-06.jpg", alt: "Poltrona clássica higienizada" },
-              { img: "trabalho-07.jpg", alt: "Cadeira clássica branca higienizada" },
-              { img: "trabalho-08.jpg", alt: "Poltronas de couro higienizadas" },
-              { img: "trabalho-09.jpg", alt: "Poltrona branca higienizada em quarto" },
-              { img: "trabalho-10.jpg", alt: "Banco de madeira com assento higienizado" },
-              { img: "trabalho-11.jpg", alt: "Banqueta estofada higienizada" },
-              { img: "trabalho-12.jpg", alt: "Equipe higienizando poltrona com extratora" },
-              { img: "trabalho-13.jpg", alt: "Higienização de cabeceira estofada de cama" },
-              { img: "trabalho-14.jpg", alt: "Aspiração de carpete em escritório" }
-            ].map((item, idx) => (
-              <div key={idx} className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 group">
-                <img
-                  src={`assets/images/${item.img}`}
-                  alt={item.alt}
-                  loading="lazy"
-                  decoding="async"
-                  width={900}
-                  height={675}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                />
-              </div>
+          <div className="overflow-hidden -mx-2" ref={worksRef}>
+            <div className="flex">
+              {WORKS.map((item, idx) => (
+                <div key={idx} className="flex-[0_0_78%] sm:flex-[0_0_45%] lg:flex-[0_0_31%] xl:flex-[0_0_24%] min-w-0 px-2">
+                  <div className="aspect-[4/3] rounded-2xl overflow-hidden bg-slate-200 group">
+                    <img
+                      src={`assets/images/${item.img}`}
+                      alt={item.alt}
+                      loading={idx < 8 ? "eager" : "lazy"}
+                      decoding="async"
+                      fetchPriority={idx < 4 ? "high" : "low"}
+                      width={900}
+                      height={675}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="flex justify-center gap-2 mt-8">
+            {WORKS.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => worksApi && worksApi.scrollTo(idx)}
+                aria-label={`Ir para o trabalho ${idx + 1}`}
+                className={`h-2 rounded-full transition-all ${idx === worksIndex ? 'w-7 bg-blue-600' : 'w-2 bg-slate-300 hover:bg-slate-400'}`}
+              />
             ))}
           </div>
         </div>
@@ -446,14 +502,14 @@ export default function App() {
       <section id="equipe" className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <div className="aspect-[16/10] rounded-[2.5rem] overflow-hidden bg-slate-200 shadow-xl shadow-slate-200/60">
+            <div className="aspect-[4/3] rounded-[2.5rem] overflow-hidden bg-slate-200 shadow-xl shadow-slate-200/60">
               <img
                 src="assets/images/equipe.jpg"
                 alt="Zilda e Edvaldo, da O Doutor Limpeza, de uniforme"
                 loading="lazy"
                 decoding="async"
-                width={1280}
-                height={800}
+                width={1400}
+                height={1050}
                 className="w-full h-full object-cover"
               />
             </div>
@@ -638,6 +694,12 @@ export default function App() {
           <div className="text-center mb-16">
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className="text-slate-500 font-semibold">Avaliações no Google</span>
+              {googleReviews.length > 0 && (
+                <span className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                  Direto do Google
+                </span>
+              )}
             </div>
             <h2 className="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">O que dizem nossos clientes</h2>
             <div className="flex items-center justify-center gap-3">
